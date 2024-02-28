@@ -1,3 +1,9 @@
+# OSC2024
+
+| GitHub Account | Student ID | Name        |
+| -------------- | ---------- | ----------- |
+| ppodds         | B111505    | Hung-Yi Liu |
+
 ## 實驗環境
 
 - Ubuntu 22.04
