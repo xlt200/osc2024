@@ -11,8 +11,7 @@ _start:
 // cpuid = 0
 1:
     // Initialize stack pointer: set to stack_top
-    ldr x0, =STACK_HIGH_POS // load STACK_HIGH_POS addr
-    ldr x0, [x0] // load STACK_HIGH_POS value
+    ldr x0, =__phys_binary_load_addr // load __phys_binary_load_addr
     mov sp, x0 // move value to sp
 
     // Clear bss

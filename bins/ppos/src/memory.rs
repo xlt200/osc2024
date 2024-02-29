@@ -1,4 +1,21 @@
-pub const STACK_SIZE: usize = 4 * 1024 * 1024;
-pub const STACK_LOW_POS: usize = 0x0;
-#[no_mangle]
-pub static STACK_HIGH_POS: usize = 0x80000;
+/*
+* Usage:
+*    unsafe {
+*        println!(
+*            "{:#08x}",
+*            &memory::__phys_dram_start_addr as *const usize as usize
+*        );
+*        println!(
+*            "{:#08x}",
+*            &memory::__phys_binary_load_addr as *const usize as usize
+*        );
+*        println!("{:#08x}", &memory::__bss_begin as *const usize as usize);
+*        println!("{:#08x}", &memory::__bss_end as *const usize as usize);
+*    }
+*/
+extern "C" {
+    pub static __phys_dram_start_addr: usize;
+    pub static __phys_binary_load_addr: usize;
+    pub static __bss_begin: usize;
+    pub static __bss_end: usize;
+}

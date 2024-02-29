@@ -1,18 +1,39 @@
+__phys_dram_start_addr = 0;
+__phys_binary_load_addr = 0x80000;
+
+ENTRY(__phys_binary_load_addr)
+
+/**
+ * Flags:
+ * 4 == R
+ * 5 == RX
+ * 6 == RW
+ */
+PHDRS
+{
+  segment_stack PT_LOAD FLAGS(6);
+  segment_code PT_LOAD FLAGS(5);
+  segment_data PT_LOAD FLAGS(6);
+}
+
 SECTIONS
 {
-  . = 0x80000;
+  . = __phys_dram_start_addr;
+  .stack (NOLOAD) : {
+    . += __phys_binary_load_addr;
+  } : segment_stack
+  . = __phys_binary_load_addr;
   .text : {
-    *(.text.boot)
-    *(.text.*)
-  }
-  .rodata : {
-    *(.rodata)
-    *(.rodata.*)
-  }
-  .data : { *(.data) }
-  .bss ALIGN(0x8) : {
+    KEEP(*(.text.boot))
+    *(.text.kernel_start)
+    *(.text*)
+  } : segment_code
+  .rodata : ALIGN(8) { *(.rodata*) } : segment_code
+  .data : { *(.data*) } : segment_data
+  .bss (NOLOAD) : ALIGN(16) {
     __bss_begin = .;
     *(.bss*)
+    . = ALIGN(16);
     __bss_end = .;
-  } 
+  } : segment_data
 }
