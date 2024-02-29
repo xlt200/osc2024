@@ -7,13 +7,17 @@ mod shell;
 
 use core::{arch::global_asm, panic::PanicInfo};
 
-use library::println;
+use library::{console::console, println};
 use shell::Shell;
 
-global_asm!(include_str!("entry.S"));
+global_asm!(include_str!("boot.s"));
 
 #[no_mangle]
-pub extern "C" fn kernel_start() {
+pub unsafe fn _start_rust() -> ! {
+    kernel_start();
+}
+
+unsafe fn kernel_start() -> ! {
     unsafe {
         driver::init().unwrap();
     }

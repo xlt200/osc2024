@@ -1,8 +1,5 @@
-use core::{
-    cell::UnsafeCell,
-    fmt::{self, Write},
-    ptr::{read_volatile, write_volatile},
-};
+use core::fmt;
+use core::fmt::Write;
 
 use tock_registers::{
     interfaces::{ReadWriteable, Readable, Writeable},
@@ -22,44 +19,7 @@ struct MiniUartInner {
 pub struct MiniUart {
     inner: Mutex<MiniUartInner>,
 }
-/*
-/**
- * The AUXENB register is used to enable the three modules; UART, SPI1, SPI2
- */
-const AUXENB_REGISTER_ADDR: *mut u32 = (PERIPHERAL_MAPPING_BASE + 0x00215004) as *mut u32;
-/**
- * Mini Uart Extra Control
- */
-const AUX_MU_CNTL_REG_ADDR: *mut u32 = (PERIPHERAL_MAPPING_BASE + 0x00215060) as *mut u32;
-/**
- * Mini Uart Interrupt Enable
- */
-const AUX_MU_IER_REG_ADDR: *mut u32 = (PERIPHERAL_MAPPING_BASE + 0x00215044) as *mut u32;
-/**
- * Mini Uart Line Control
- */
-const AUX_MU_LCR_REG_ADDR: *mut u32 = (PERIPHERAL_MAPPING_BASE + 0x0021504C) as *mut u32;
-/**
- * Mini Uart Modem Control
- */
-const AUX_MU_MCR_REG_ADDR: *mut u32 = (PERIPHERAL_MAPPING_BASE + 0x00215050) as *mut u32;
-/**
- * Mini Uart Baudrate
- */
-const AUX_MU_BAUD_REG_ADDR: *mut u32 = (PERIPHERAL_MAPPING_BASE + 0x00215068) as *mut u32;
-/**
- * Mini Uart Interrupt Identify
- */
-const AUX_MU_IIR_REG_ADDR: *mut u32 = (PERIPHERAL_MAPPING_BASE + 0x00215048) as *mut u32;
-/**
- * Mini Uart Line Status
- */
-const AUX_MU_LSR_REG_ADDR: *mut u32 = (PERIPHERAL_MAPPING_BASE + 0x00215054) as *mut u32;
-/**
- * Mini Uart I/O Data
- */
-const AUX_MU_IO_REG_ADDR: *mut u32 = (PERIPHERAL_MAPPING_BASE + 0x00215040) as *mut u32;
-*/
+
 register_bitfields![
     u32,
     AUX_ENB  [
@@ -178,35 +138,28 @@ impl MiniUartInner {
         self.registers.controll.modify(
             AUX_MU_CNTL::TRANSMITTER_ENABLE::DISABLE + AUX_MU_CNTL::RECEIVER_ENABLE::DISABLE,
         );
-        //write_volatile(AUX_MU_CNTL_REG_ADDR, 0);
         // disable interrupt which is not needed currently
         self.registers.interrupt_enable.modify(
             AUX_MU_IER::ENABLE_TRANSMIT_INTERRUPT::DISABLE
                 + AUX_MU_IER::ENABLE_RECEIVE_INTERRUPT::DISABLE,
         );
-        //write_volatile(AUX_MU_IER_REG_ADDR, 0);
         // set the data size to 8 bit
         self.registers
             .line_controll
             .modify(AUX_MU_LCR::DATA_SIZE::EIGHT_BITS);
-        //write_volatile(AUX_MU_LCR_REG_ADDR, 3);
         // disable auto flow control
         self.registers.modem_controll.set(0);
-        //write_volatile(AUX_MU_MCR_REG_ADDR, 0);
         // set baud rate to 115200
         self.registers.baudrate.set(270);
-        //write_volatile(AUX_MU_BAUD_REG_ADDR, 270);
         // disable FIFO
         self.registers.interrupt_identify.modify(
             AUX_MU_IIR::FIFO_CLEAR_BITS::CLEAR_TRANSMIT_FIFO
                 + AUX_MU_IIR::FIFO_CLEAR_BITS::CLEAR_RECEIVE_FIFO,
         );
-        //write_volatile(AUX_MU_IIR_REG_ADDR, 6);
         // enable transmitter and receiver
         self.registers
             .controll
             .modify(AUX_MU_CNTL::TRANSMITTER_ENABLE::ENABLE + AUX_MU_CNTL::RECEIVER_ENABLE::ENABLE);
-        //write_volatile(AUX_MU_CNTL_REG_ADDR, 3);
     }
 
     /**

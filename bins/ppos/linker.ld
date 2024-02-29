@@ -24,8 +24,9 @@ SECTIONS
   } : segment_stack
   . = __phys_binary_load_addr;
   .text : {
-    KEEP(*(.text.boot))
-    *(.text.kernel_start)
+    KEEP(*(.text._start))
+    *(.text._start_arguments)
+    *(.text._start_rust)
     *(.text*)
   } : segment_code
   .rodata : ALIGN(8) { *(.rodata*) } : segment_code

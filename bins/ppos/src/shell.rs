@@ -24,7 +24,7 @@ impl Shell {
         print!("# ");
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> ! {
         self.shell_hint();
         loop {
             let c = console::console().read_char();

@@ -95,11 +95,11 @@ impl GPIOInner {
         // disable pin pull-up/down
         // for pin 14, 15
         self.registers.gppud.write(GPPUD::PUD::Off);
-        spin_for_cycle(2000);
+        spin_for_cycle(150);
         self.registers
             .gppudclk0
             .write(GPPUDCLK0::PUDCLK15::AssertClock + GPPUDCLK0::PUDCLK14::AssertClock);
-        spin_for_cycle(2000);
+        spin_for_cycle(150);
         self.registers.gppud.write(GPPUD::PUD::Off);
         self.registers.gppudclk0.set(0);
     }
