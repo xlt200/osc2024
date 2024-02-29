@@ -32,8 +32,8 @@ sudo apt install qemu-system-arm
 ```shell
 # Install multi arch gdb
 sudo apt install gdb-multiarch
-# Install pwndbg (gdb plugin)
-cd ~ && git clone https://github.com/pwndbg/pwndbg && cd pwndbg && ./setup.sh
+# Install GEF (gdb plugin)
+bash -c "$(wget https://gef.blah.cat/sh -O -)"
 ```
 
 ## Build Executable And Binary Image
