@@ -5,3 +5,4 @@ pub mod gpio;
 pub mod mailbox;
 pub mod mini_uart;
 pub mod mmio_deref_wrapper;
+pub mod watchdog;

@@ -1,6 +1,6 @@
 use core::ptr::{read_volatile, write_volatile};
 
-use cpu::mmio::PERIPHERAL_MMIO_BASE;
+use bsp::memory::PERIPHERAL_MMIO_BASE;
 
 const MAILBOX_READ_REG_ADDR: *mut u32 = (PERIPHERAL_MMIO_BASE + 0xb880) as *mut u32;
 const MAILBOX_STATUS_REG_ADDR: *mut u32 = (PERIPHERAL_MMIO_BASE + 0xb898) as *mut u32;

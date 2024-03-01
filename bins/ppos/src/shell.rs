@@ -1,7 +1,9 @@
-use core::ptr::write_volatile;
-use cpu::mmio::PERIPHERAL_MMIO_BASE;
+use bsp::memory::PERIPHERAL_MMIO_BASE;
+use core::{arch::asm, ptr::write_volatile};
 use device::mailbox::Mailbox;
 use library::{console, print, println, string::String};
+
+use crate::driver;
 
 pub struct Shell {
     input: String,
@@ -44,17 +46,16 @@ impl Shell {
         println!("help\t: print this help menu");
         println!("hello\t: print Hello World!");
         println!("reboot\t: reboot the device");
+        println!("cancel-reboot\t: cancel reboot");
         println!("board-revision\t: get board revision");
     }
 
     fn reboot(&self) {
-        const PM_PASSWORD: u32 = 0x5a000000;
-        const PM_RSTC_REG_ADDR: *mut u32 = (PERIPHERAL_MMIO_BASE + 0x0010001c) as *mut u32;
-        const PM_WDOG_REG_ADDR: *mut u32 = (PERIPHERAL_MMIO_BASE + 0x00100024) as *mut u32;
-        unsafe {
-            write_volatile(PM_RSTC_REG_ADDR, PM_PASSWORD | 0x20);
-            write_volatile(PM_WDOG_REG_ADDR, PM_PASSWORD);
-        }
+        driver::watchdog().reset(0x20);
+    }
+
+    fn cancel_reboot(&self) {
+        driver::watchdog().cancel_reset();
     }
 
     fn hello(&self) {
@@ -71,6 +72,7 @@ impl Shell {
             "help" => self.help(),
             "hello" => self.hello(),
             "reboot" => self.reboot(),
+            "cancel-reboot" => self.cancel_reboot(),
             "board-revision" => self.get_board_revision(),
             "" => (),
             cmd => println!("{}: command not found", cmd),

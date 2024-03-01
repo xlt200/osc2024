@@ -1,11 +1,3 @@
 [workspace]
-members = [
-  "libs/library",
-  "libs/device",
-  "libs/cpu",
-  "bins/bootloader",
-  "bins/ppos",
-  "bins/kernel-transfer",
-  "bins/05_drivers_gpio_uart",
-]
+members = ["libs/bsp", "libs/cpu", "libs/device", "libs/library", "bins/ppos"]
 resolver = "2"

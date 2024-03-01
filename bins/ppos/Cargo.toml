@@ -9,3 +9,4 @@ edition = "2021"
 library = { path = "../../libs/library" }
 cpu = { path = "../../libs/cpu/" }
 device = { path = "../../libs/device" }
+bsp = { path = "../../libs/bsp" }
