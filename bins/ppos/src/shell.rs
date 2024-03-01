@@ -1,9 +1,6 @@
-use bsp::memory::PERIPHERAL_MMIO_BASE;
-use core::{arch::asm, ptr::write_volatile};
-use device::mailbox::Mailbox;
 use library::{console, print, println, string::String};
 
-use crate::driver;
+use crate::driver::{self, mailbox};
 
 pub struct Shell {
     input: String,
@@ -63,7 +60,7 @@ impl Shell {
     }
 
     fn get_board_revision(&self) {
-        println!("board revision: {:#08x}", Mailbox::get_board_revision());
+        println!("board revision: {:#08x}", mailbox().get_board_revision());
     }
 
     fn execute_command(&mut self) {

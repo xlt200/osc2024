@@ -7,7 +7,7 @@ mod shell;
 
 use core::{arch::global_asm, panic::PanicInfo};
 
-use library::{console::console, println};
+use library::println;
 use shell::Shell;
 
 global_asm!(include_str!("boot.s"));

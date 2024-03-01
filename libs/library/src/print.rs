@@ -1,6 +1,5 @@
 use crate::console;
 
-use super::format;
 use core::fmt::Arguments;
 
 pub fn _print(args: Arguments) {

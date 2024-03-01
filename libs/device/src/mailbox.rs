@@ -1,10 +1,11 @@
-use core::ptr::{read_volatile, write_volatile};
+use library::sync::mutex::Mutex;
+use tock_registers::{
+    interfaces::{Readable, Writeable},
+    register_bitfields, register_structs,
+    registers::{ReadOnly, WriteOnly},
+};
 
-use bsp::memory::PERIPHERAL_MMIO_BASE;
-
-const MAILBOX_READ_REG_ADDR: *mut u32 = (PERIPHERAL_MMIO_BASE + 0xb880) as *mut u32;
-const MAILBOX_STATUS_REG_ADDR: *mut u32 = (PERIPHERAL_MMIO_BASE + 0xb898) as *mut u32;
-const MAILBOX_WRITE_REG_ADDR: *mut u32 = (PERIPHERAL_MMIO_BASE + 0xb8a0) as *mut u32;
+use crate::{device_driver::DeviceDriver, mmio_deref_wrapper::MMIODerefWrapper};
 
 #[repr(u32)]
 enum BufferRequestCode {
@@ -22,67 +23,132 @@ enum TagIdentifier {
     GetBoardRevision = 0x00010002,
 }
 
-pub struct Mailbox {}
+register_bitfields! [
+    u32,
+    MAILBOX_STATUS [
+        FULL OFFSET(31) NUMBITS(1) [
+            NOT_FULL = 0,
+            FULL = 1,
+        ],
+        EMPTY OFFSET(30) NUMBITS(1) [
+            NOT_EMPTY = 0,
+            EMPTY = 1,
+        ]
+    ],
+    MAILBOX_READ [
+        DATA OFFSET(4) NUMBITS(28) [],
+        CHANNEL OFFSET(0) NUMBITS(4) []
+    ],
+    MAILBOX_WRITE [
+        DATA OFFSET(4) NUMBITS(28) [],
+        CHANNEL OFFSET(0) NUMBITS(4) []
+    ]
+];
 
-impl Mailbox {
-    fn is_writable() -> bool {
-        unsafe { (read_volatile(MAILBOX_STATUS_REG_ADDR) & (1 << 31)) == 0 }
+register_structs! {
+    Registers {
+        (0x00 => read: ReadOnly<u32, MAILBOX_READ::Register>),
+        (0x04 => _reserved1),
+        (0x18 => status: ReadOnly<u32, MAILBOX_STATUS::Register>),
+        (0x1c => _reserved2),
+        (0x20 => write: WriteOnly<u32, MAILBOX_WRITE::Register>),
+        (0x24 => @END),
+    }
+}
+
+struct MailboxInner {
+    registers: MMIODerefWrapper<Registers>,
+}
+
+impl MailboxInner {
+    /**
+     * # Safety
+     *
+     * - The user must ensure to provide a correct MMIO start address.
+     */
+    const unsafe fn new(mmio_start_addr: usize) -> Self {
+        Self {
+            registers: MMIODerefWrapper::new(mmio_start_addr),
+        }
     }
 
-    fn is_readable() -> bool {
-        unsafe { read_volatile(MAILBOX_STATUS_REG_ADDR) & (1 << 30) == 0 }
+    fn is_writable(&self) -> bool {
+        !self.registers.status.is_set(MAILBOX_STATUS::FULL)
     }
 
-    fn read_from_reg() -> u32 {
-        unsafe { read_volatile(MAILBOX_READ_REG_ADDR) }
+    fn is_readable(&self) -> bool {
+        !self.registers.status.is_set(MAILBOX_STATUS::EMPTY)
     }
 
-    fn write_to_reg(v: u32) {
-        unsafe { write_volatile(MAILBOX_WRITE_REG_ADDR, v) }
-    }
-
-    pub fn read(channel: u8) -> *mut u32 {
+    fn read(&self, channel: u8) -> *mut u32 {
         loop {
-            while !Self::is_readable() {}
-            let data = Self::read_from_reg();
-            // get 4 LSB
-            let data_channel = (data & 0b1111) as u8;
+            while !self.is_readable() {}
+            let tmp = self.registers.read.get();
+            let data = tmp & !(0b1111);
+            let data_channel = (tmp & 0b1111) as u8;
             if data_channel == channel {
                 // get 28 MSB
-                return (data & !(0b1111)) as *mut u32;
+                return data as *mut u32;
             }
         }
     }
 
-    pub fn write(channel: u8, buffer_addr: *mut u32) {
-        while !Self::is_writable() {}
+    fn write(&self, channel: u8, buffer_addr: *mut u32) {
+        while !self.is_writable() {}
         // use 28 MSB
         let message_addr = buffer_addr as u32 & !(0b1111);
-        Self::write_to_reg(message_addr | channel as u32);
+        self.registers.write.set(message_addr | channel as u32);
     }
 
-    pub fn call(buffer_addr: *mut u32) -> *mut u32 {
-        Self::write(8, buffer_addr);
-        Self::read(8)
+    fn call(&self, buffer_addr: *mut u32) -> *mut u32 {
+        self.write(8, buffer_addr);
+        self.read(8)
     }
 
-    pub fn get_board_revision() -> u32 {
-        let mut buffer = [0; 7];
+    fn get_board_revision(&self) -> u32 {
+        #[repr(align(16))]
+        struct GetBoardRevisionBuffer {
+            inner: [u32; 7],
+        }
+        let mut buffer = GetBoardRevisionBuffer { inner: [0; 7] };
         // set buffer length (in bytes)
-        buffer[0] = 7 * 4;
+        buffer.inner[0] = 7 * 4;
         // set request code
-        buffer[1] = BufferRequestCode::ProcessRequest as u32;
+        buffer.inner[1] = BufferRequestCode::ProcessRequest as u32;
         // set tag tag identifier
-        buffer[2] = TagIdentifier::GetBoardRevision as u32;
+        buffer.inner[2] = TagIdentifier::GetBoardRevision as u32;
         // set value buffer length (in bytes)
-        buffer[3] = 4;
+        buffer.inner[3] = 4;
         // set tag request code for request
-        buffer[4] = 0;
+        buffer.inner[4] = 0;
         // set value buffer
-        buffer[5] = 0;
+        buffer.inner[5] = 0;
         // set end tag bits
-        buffer[6] = 0;
-        Self::call(buffer.as_mut_ptr());
-        buffer[5]
+        buffer.inner[6] = 0;
+        self.call(buffer.inner.as_mut_ptr());
+        buffer.inner[5]
     }
 }
+
+pub struct Mailbox {
+    inner: Mutex<MailboxInner>,
+}
+
+impl Mailbox {
+    /**
+     * # Safety
+     *
+     * - The user must ensure to provide a correct MMIO start address.
+     */
+    pub const unsafe fn new(mmio_start_addr: usize) -> Self {
+        Self {
+            inner: Mutex::new(MailboxInner::new(mmio_start_addr)),
+        }
+    }
+
+    pub fn get_board_revision(&self) -> u32 {
+        self.inner.lock().unwrap().get_board_revision()
+    }
+}
+
+impl DeviceDriver for Mailbox {}
