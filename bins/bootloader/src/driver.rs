@@ -1,4 +1,4 @@
-use bsp::memory::{AUX_MMIO_BASE, GPIO_MMIO_BASE, MAILBOX_MMIO_BASE, WATCHDOG_MMIO_BASE};
+use bsp::memory::{AUX_MMIO_BASE, GPIO_MMIO_BASE};
 use device::device_driver::{driver_manager, DeviceDriverDescriptor};
 use device::gpio::GPIO;
 use device::mini_uart::MiniUart;
