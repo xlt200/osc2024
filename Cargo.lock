@@ -12,6 +12,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bootloader"
+version = "0.1.0"
+dependencies = [
+ "bsp",
+ "device",
+ "library",
+]
+
+[[package]]
 name = "bsp"
 version = "0.1.0"
 
@@ -33,6 +42,10 @@ dependencies = [
  "library",
  "tock-registers 0.9.0",
 ]
+
+[[package]]
+name = "kernel-transfer"
+version = "0.1.0"
 
 [[package]]
 name = "library"

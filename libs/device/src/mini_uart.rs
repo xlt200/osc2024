@@ -187,14 +187,6 @@ impl MiniUartInner {
         while !self.is_writable() {}
         self.registers.data.set(value as u32);
     }
-
-    pub fn read_u64(&self) -> u64 {
-        let mut n = 0;
-        for i in 0..8 {
-            n += (self.read_byte() as u64) << (i * 8);
-        }
-        n
-    }
 }
 
 impl MiniUart {
