@@ -1,12 +1,13 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+
 mod driver;
 mod memory;
 mod shell;
 
 use core::{arch::global_asm, panic::PanicInfo};
-
 use library::println;
 use shell::Shell;
 

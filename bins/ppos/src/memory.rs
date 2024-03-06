@@ -18,4 +18,8 @@ extern "C" {
     pub static __phys_binary_load_addr: usize;
     pub static __bss_begin: usize;
     pub static __bss_end: usize;
+    pub static __heap_begin: usize;
+    pub static __heap_end: usize;
 }
+
+pub mod heap_allocator;
