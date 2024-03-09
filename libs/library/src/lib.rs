@@ -6,3 +6,4 @@ pub mod io;
 pub mod print;
 pub mod string;
 pub mod sync;
+pub mod time;

@@ -27,9 +27,7 @@ impl HeapAllocatorInner {
         p
     }
 
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: core::alloc::Layout) {
-        todo!()
-    }
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: core::alloc::Layout) {}
 
     #[inline(always)]
     unsafe fn heap_start_addr() -> usize {
@@ -61,6 +59,7 @@ unsafe impl GlobalAlloc for HeapAllocator {
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: core::alloc::Layout) {
-        todo!()
+        let inner = self.inner.lock().unwrap();
+        inner.dealloc(ptr, layout);
     }
 }

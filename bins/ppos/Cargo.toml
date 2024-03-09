@@ -6,7 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-library = { path = "../../libs/library" }
-cpu = { path = "../../libs/cpu/" }
-device = { path = "../../libs/device" }
 bsp = { path = "../../libs/bsp" }
+cpio = { path = "../../libs/cpio" }
+cpu = { path = "../../libs/cpu" }
+device = { path = "../../libs/device" }
+library = { path = "../../libs/library" }
+vfs = { path = "../../libs/vfs" }

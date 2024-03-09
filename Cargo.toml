@@ -1,9 +1,11 @@
 [workspace]
 members = [
   "libs/bsp",
+  "libs/cpio",
   "libs/cpu",
   "libs/device",
   "libs/library",
+  "libs/vfs",
   "bins/bootloader",
   "bins/kernel-transfer",
   "bins/ppos",

@@ -1,4 +1,7 @@
-use library::{console, print, println, string::String};
+use alloc::boxed::Box;
+use bsp::memory::INIT_RAMFS_BASE;
+use cpio::CPIOArchive;
+use library::{console, format, print, println, string::String};
 
 use crate::driver::{self, mailbox};
 
@@ -45,6 +48,8 @@ impl Shell {
         println!("reboot\t: reboot the device");
         println!("cancel-reboot\t: cancel reboot");
         println!("board-revision\t: get board revision");
+        println!("ls\t: list files");
+        println!("cat\t: show file content");
     }
 
     fn reboot(&self) {
@@ -65,14 +70,21 @@ impl Shell {
 
     fn execute_command(&mut self) {
         println!();
-        match self.input.trim() {
-            "help" => self.help(),
-            "hello" => self.hello(),
-            "reboot" => self.reboot(),
-            "cancel-reboot" => self.cancel_reboot(),
-            "board-revision" => self.get_board_revision(),
-            "" => (),
-            cmd => println!("{}: command not found", cmd),
+        let input = self.input.trim();
+        let mut split_result = input.split(" ");
+        if let Some(cmd) = split_result.next() {
+            let args = split_result.collect::<Box<[&str]>>();
+            match cmd {
+                "help" => self.help(),
+                "hello" => self.hello(),
+                "reboot" => self.reboot(),
+                "cancel-reboot" => self.cancel_reboot(),
+                "board-revision" => self.get_board_revision(),
+                "ls" => self.ls(),
+                "cat" => self.cat(args),
+                "" => (),
+                cmd => println!("{}: command not found", cmd),
+            }
         }
         self.input.clear();
     }
@@ -90,5 +102,32 @@ impl Shell {
         // move the cursor to the previous character and overwrite it with a space
         // then move the cursor back again
         print!("\x08 \x08");
+    }
+
+    fn ls(&self) {
+        let mut cpio_archive = unsafe { CPIOArchive::from_memory(INIT_RAMFS_BASE) };
+        while let Some(file) = cpio_archive.read_next() {
+            println!("{}", file.name);
+        }
+    }
+
+    fn cat(&self, args: Box<[&str]>) {
+        if args.len() != 1 {
+            println!("Usage: cat <file>");
+            return;
+        }
+
+        let t = format!("{}\0", args[0]);
+        let filename = t.as_str();
+        let mut cpio_archive = unsafe { CPIOArchive::from_memory(INIT_RAMFS_BASE) };
+        while let Some(file) = cpio_archive.read_next() {
+            if file.name == filename {
+                for byte in file.content {
+                    print!("{}", *byte as char);
+                }
+                return;
+            }
+        }
+        println!("cat: {}: No such file or directory", filename);
     }
 }
