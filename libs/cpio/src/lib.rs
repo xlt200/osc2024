@@ -1,11 +1,8 @@
 #![no_std]
 
-use core::{
-    mem::{align_of, size_of},
-    slice, str,
-};
+use core::{mem::align_of, slice, str};
 
-use library::{println, time::Time};
+use library::time::Time;
 use vfs::file::FileMetadata;
 
 const NEW_ASCII_CPIO_MAGIC: [u8; 6] = [b'0', b'7', b'0', b'7', b'0', b'1'];
