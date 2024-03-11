@@ -1,0 +1,4 @@
+target
+kernel8.img
+.gdb_history
+initramfs.cpio
