@@ -21,6 +21,7 @@ enum BufferResponseCode {
 #[repr(u32)]
 enum TagIdentifier {
     GetBoardRevision = 0x00010002,
+    GetARMMemory = 0x00010005,
 }
 
 register_bitfields! [
@@ -54,6 +55,11 @@ register_structs! {
         (0x20 => write: WriteOnly<u32, MAILBOX_WRITE::Register>),
         (0x24 => @END),
     }
+}
+
+pub struct ARMMemoryInfo {
+    pub base_address: u32,
+    pub size: u32,
 }
 
 struct MailboxInner {
@@ -128,6 +134,34 @@ impl MailboxInner {
         self.call(buffer.inner.as_mut_ptr());
         buffer.inner[5]
     }
+
+    fn get_arm_memory(&self) -> ARMMemoryInfo {
+        #[repr(align(16))]
+        struct GetARMMemoryBuffer {
+            inner: [u32; 8],
+        }
+        let mut buffer = GetARMMemoryBuffer { inner: [0; 8] };
+        // set buffer length (in bytes)
+        buffer.inner[0] = 8 * 4;
+        // set request code
+        buffer.inner[1] = BufferRequestCode::ProcessRequest as u32;
+        // set tag tag identifier
+        buffer.inner[2] = TagIdentifier::GetARMMemory as u32;
+        // set value buffer length (in bytes)
+        buffer.inner[3] = 8;
+        // set tag request code for request
+        buffer.inner[4] = 0;
+        // set value buffer
+        buffer.inner[5] = 0;
+        buffer.inner[6] = 0;
+        // set end tag bits
+        buffer.inner[7] = 0;
+        self.call(buffer.inner.as_mut_ptr());
+        ARMMemoryInfo {
+            base_address: buffer.inner[5],
+            size: buffer.inner[6],
+        }
+    }
 }
 
 pub struct Mailbox {
@@ -148,6 +182,10 @@ impl Mailbox {
 
     pub fn get_board_revision(&self) -> u32 {
         self.inner.lock().unwrap().get_board_revision()
+    }
+
+    pub fn get_arm_memory(&self) -> ARMMemoryInfo {
+        self.inner.lock().unwrap().get_arm_memory()
     }
 }
 

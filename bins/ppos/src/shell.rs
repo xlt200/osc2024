@@ -47,7 +47,7 @@ impl Shell {
         println!("hello\t: print Hello World!");
         println!("reboot\t: reboot the device");
         println!("cancel-reboot\t: cancel reboot");
-        println!("board-revision\t: get board revision");
+        println!("info\t: get hardware infomation");
         println!("ls\t: list files");
         println!("cat\t: show file content");
     }
@@ -64,8 +64,11 @@ impl Shell {
         println!("Hello World!");
     }
 
-    fn get_board_revision(&self) {
+    fn info(&self) {
+        let mem_info = mailbox().get_arm_memory();
         println!("board revision: {:#08x}", mailbox().get_board_revision());
+        println!("ARM memory base address: {:#08x}", mem_info.base_address);
+        println!("ARM memory size: {} bytes", mem_info.size);
     }
 
     fn execute_command(&mut self) {
@@ -79,7 +82,7 @@ impl Shell {
                 "hello" => self.hello(),
                 "reboot" => self.reboot(),
                 "cancel-reboot" => self.cancel_reboot(),
-                "board-revision" => self.get_board_revision(),
+                "info" => self.info(),
                 "ls" => self.ls(),
                 "cat" => self.cat(args),
                 "" => (),
