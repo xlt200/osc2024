@@ -1,4 +1,4 @@
-# OSC2023
+# OSC2024
 
 | Github Account | Student ID | Name          |
 |----------------|------------|---------------|
@@ -12,7 +12,7 @@
 ## Build 
 
 ```
-make kernel.img
+make 
 ```
 
 ## Test With QEMU
