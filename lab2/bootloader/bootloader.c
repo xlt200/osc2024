@@ -27,7 +27,6 @@ void load_img(){
     unsigned char *size_buffer = (unsigned char *) &size;
     for(int i=0; i<4; i++) 
 	    size_buffer[i] = uart_get_char();
-        // uart_send_string((char*)size_buffer);
     uart_send_string("size-check correct\n");
     char *kernel = (char *) 0x80000;
 
@@ -59,7 +58,7 @@ void load_img(){
 
     asm volatile(
         "ldr x2, =0x20000;"
-        "ldr x0, [x2];"
+        "ldr x0, [x2];"  // put back dtb address 
         "mov x30, 0x80000;"
         "ret;"
     );
