@@ -54,9 +54,9 @@ void shell(){
        uart_send_string("hello	:print Hello World!\n");
        uart_send_string("info	:Get the hardware's information\n");
        uart_send_string("ls	:list the file\n");
-	   uart_send_string("cat	:print file content\n");
-	   uart_send_string("malloc	:give dynamic memory space\n");
-	   uart_send_string("dtb	:print device tree\n");
+       uart_send_string("cat	:print file content\n");
+       uart_send_string("malloc	:give dynamic memory space\n");
+       uart_send_string("dtb	:print device tree\n");
      } 
      else if (ut_st_comp(input_string,"hello")) 
      {
