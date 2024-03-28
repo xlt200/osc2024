@@ -11,11 +11,11 @@ void main()
     // set up serial console
     //uart_init();
     uart_init();
-    // say hello
+
     //uart_send_string("\n");
     //uart_send_string("In shell main!\n");
 
-	fdt_traverse(get_cpio_addr,_dtb_ptr);
+    fdt_traverse(get_cpio_addr,_dtb_ptr);
     //uart_send_hex((uintptr_t) _dtb_ptr);
     //uart_send_string("\n");
     //uart_send_hex((uintptr_t) cpio_addr);
