@@ -21,7 +21,7 @@ void read_command(char* buffer) {
 	}
 }
 
-
+//
 void load_img(){
     unsigned int size = 0;
     unsigned char *size_buffer = (unsigned char *) &size;
