@@ -35,20 +35,22 @@ void load_img(){
 
     uart_send_string("kernel-loaded\n");
     
-    char buffer[256]; 
+    char buffer[256];
+    uart_send_string("please type 'in' to get into the shell_kernel\n");
     while(1)    
     {
         uart_send_string("# ");
 	    read_command(buffer);
         char * input_string = buffer;
-        if(ut_string_compare(input_string,"help"))
+        if(ut_string_compare(input_string,"in"))
         {
             break;
         }
         else 
         {
             // uart_send_hex((uintptr_t) _dtb_addr);
-            uart_send_string("The instruct is not exist.\n");
+            // uart_send_string("The instruct is not exist.\n");
+            uart_send_string("\n");
         }
     }
     
@@ -56,6 +58,8 @@ void load_img(){
     uart_send_string("start shell kernel\n");
 
     asm volatile(
+        "ldr x2, =0x20000;"
+        "ldr x0, [x2];"
         "mov x30, 0x80000;"
         "ret;"
     );
@@ -78,8 +82,8 @@ void load_img(){
     */
 
    /*
-   	ldr X5, =_dtb_addr
-	str x0, [x5]
+   	ldr x1, =_dtb_addr
+	str x0, [x1]
     .global _dtb_addr	//define a global variable _dtb_addr
     .section .data		//_dtb_addr is in data section
     _dtb_addr: .dc.a 0x0	//it defines _dtb_addr to be a 8-byte constant with a value of 0x0

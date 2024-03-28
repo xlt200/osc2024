@@ -17,6 +17,8 @@ relocate:
 setting: 
 	ldr x1, =_start
  	mov sp, x1
+	ldr x2, =0x20000
+	str x0, [x2]
 	ldr x1, =__bss_start
 	ldr w2, =__bss_size
 
@@ -29,4 +31,3 @@ clear_bss:
 bootloader_main: 
 	bl main-0x20000
 	b  bootloader_main
-
