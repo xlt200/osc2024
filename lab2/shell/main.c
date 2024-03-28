@@ -4,15 +4,21 @@
 #include "header/utils.h"
 
 extern void *_dtb_ptr;
+extern char * cpio_addr;
 void main()
 {
 
     // set up serial console
+    //uart_init();
     uart_init();
-	
     // say hello
-    uart_send_string("\nIn shell main!\n");
+    //uart_send_string("\n");
+    //uart_send_string("In shell main!\n");
+
 	fdt_traverse(get_cpio_addr,_dtb_ptr);
+    //uart_send_hex((uintptr_t) _dtb_ptr);
+    //uart_send_string("\n");
+    //uart_send_hex((uintptr_t) cpio_addr);
     uart_send_string("Type in `help` to get instruction menu!\n");
     //echo everything back
 	shell();

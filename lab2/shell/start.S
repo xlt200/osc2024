@@ -4,7 +4,6 @@
 
 _start:
 	ldr		x1, =_dtb_ptr	//put _dtb_ptr into register1
-    ldr     x0, =0x2eff7600
 	str		x0, [x1]		//store dtb address from x0 to _dtb_ptr
     // read cpu id, stop slave cores
     mrs     x1, mpidr_el1

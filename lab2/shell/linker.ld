@@ -6,7 +6,7 @@ SECTIONS
     PROVIDE(_data = .);
     .data : { . = ALIGN(16); *(.data .data.* .gnu.linkonce.d*) }
     .bss (NOLOAD) : {
-        . = ALIGN(16);
+        . = ALIGN(32);
         __bss_start = .;
         *(.bss .bss.*)
         *(COMMON)

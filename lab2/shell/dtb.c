@@ -4,6 +4,7 @@
 #define UNUSED(x) (void)(x)
 
 
+// char * cpio_addr = (char*) 0x20000000;
 char * cpio_addr;
 int space = 0;
 //1. Define the callback function type(fdt_callback)
