@@ -44,28 +44,17 @@ _start:
 
 from_el2_to_el1:
 	mov		x0,#(1<<31)
-	msr		hcr_el2,x0
+	msr		hcr_el2,x0 // set EL1 runs in AARCH64
 	mov		x0,#0x345 // 0x3c5 [4:0]->ELH1 / ASH(SEerr) IRQ FRQ disable
 	msr		spsr_el2,x0 // spsr -> saved program status register
 	msr		elr_el2,lr // lr->link register elr->Eeception Link Register
 	eret
-/*
-core_timer_enable:
-	//mov	x0,1
-	//msr cntp_ctl_el0, x0 //enable
-	//mrs x0, cntfrq_el0
-	//mov x3,5
-	//mul x0, x0, x3
-	//msr cntp_tval_el0,x0 // set expired time
-	//mov x0,2
-	//ldr x1, =CORE0_TIMER_IRQ_CTRL
-	//str w0,[x1] //unmask timer interrupt
-	//ret
-*/
+
 // save general registers to stack
+// user program and the exception handler share the same general purpose reg
 .macro save_all
-    sub sp, sp, 32 * 8
-    stp x0, x1, [sp ,16 * 0]
+    sub sp, sp, 32 * 8 
+    stp x0, x1, [sp ,16 * 0] //stp -> store paire
     stp x2, x3, [sp ,16 * 1]
     stp x4, x5, [sp ,16 * 2]
     stp x6, x7, [sp ,16 * 3]

@@ -61,7 +61,6 @@ void main()
 	uart_hex(el);
 	uart_send_string("\r\n");
 	
-	// say hello
 	fdt_traverse(get_cpio_addr,_dtb_ptr);
     traverse_file();
 	uart_send_string("Type in `help` to get instruction menu!\n");

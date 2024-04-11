@@ -68,6 +68,7 @@ void parse_command(char* buffer){
 	   uart_send_string("malloc	:give dynamic memory space\n");
 	   uart_send_string("dtb	:print device tree\n");
 	   uart_send_string("exec	:execute user program\n");
+	   uart_send_string("timer or settimeout	:demo timer interrupt\n");
 	 } else if (utils_string_compare(input_string,"hello")) {
        uart_send_string("Hello World!\n");
      } else if (utils_string_compare(input_string,"info")) {
@@ -118,9 +119,9 @@ void parse_command(char* buffer){
 		 cpio_exec_program(parameter[0]);
 	 }	else if (utils_string_compare(input_string,"timer")) {
 		  
-		setTimeout("hello world1",3);
-		setTimeout("hello world2",6);
-		setTimeout("hello world3",9);
+		setTimeout("hello 1",3);
+		setTimeout("hello 2",6);
+		setTimeout("hello 3",9);
 
 	 }	else if (utils_string_compare(input_string,"settimeout")) {
 		char *message = (char *)parameter[0];

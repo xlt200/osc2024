@@ -154,7 +154,7 @@ void uart_enable_interrupt() {
     // Enable the mini UART interrupt in the second-level interrupt controller
     // uint32_t enable_irqs1 = (uint32_t) ENABLE_IRQS_1;
     uint32_t enable_irqs1 = mmio_read(ENABLE_IRQS_1);
-    enable_irqs1 |= AUXINIT_BIT_POSTION; // Set bit29
+    enable_irqs1 |= AUXINIT_BIT_POSTION; // Set bit29 (Auxiliary device)->mini uart
     mmio_write(ENABLE_IRQS_1, enable_irqs1);
 }
 
